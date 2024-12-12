@@ -25,7 +25,7 @@ struct Bar {
 }
 
 ```
-自动生成以下代码:
+Auto generated code:
 ```rust
 impl Into<Foo> for Bar {
     fn into(self) -> Foo {
@@ -52,7 +52,7 @@ struct Bar {
 }
 
 ```
-自动生成以下代码:
+Auto generated code:
 ```rust
 impl From<Foo> for Bar {
     fn from(source: Foo) -> Self {
