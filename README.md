@@ -1,6 +1,6 @@
-[![Crates.io](https://img.shields.io/crates/v/macro-into.svg)](https://crates.io/crates/macro-into)
-[![Docs](https://docs.rs/macro-into/badge.svg)](https://docs.rs/crate/macro-into/)
-[![Download](https://img.shields.io/crates/d/macro-into.svg?style=flat-square)](https://crates.io/crates/macro-into)
+[![Crates.io](https://img.shields.io/crates/v/into-from.svg)](https://crates.io/crates/into-from)
+[![Docs](https://docs.rs/into-from/badge.svg)](https://docs.rs/crate/into-from/)
+[![Download](https://img.shields.io/crates/d/into-from.svg?style=flat-square)](https://crates.io/crates/into-from)
 
 # Macro Into
 
