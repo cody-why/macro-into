@@ -1,5 +1,5 @@
 #![allow(unused)]
-use macro_into::{from, into};
+use into_from::{from, into};
 
 #[derive(Debug)]
 struct Foo {
