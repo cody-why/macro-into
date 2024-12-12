@@ -1,0 +1,22 @@
+[package]
+name = "macro-into"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+readme = "README.md"
+keywords = [
+    "into",
+    "from",
+    "struct",
+    "macro",
+]
+description = "Rust macro for impl Into<T> or From<T> for Struct"
+repository = "https://github.com/cody-why/macro-into"
+documentation = "https://docs.rs/crate/macro-into/"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+quote = "1.0"
+syn = {version = "2", features = ["full"]}
