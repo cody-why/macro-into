@@ -1,14 +1,15 @@
 #![allow(unused)]
 use into_from::{from, into};
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 struct Foo {
     a: i32,
     b: String,
+    c: i32,
 }
 
 #[derive(Debug)]
-#[into(Foo)]
+#[into(Foo, default)]
 struct Bar {
     a: i32,
     b: String,

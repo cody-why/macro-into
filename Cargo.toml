@@ -1,6 +1,6 @@
 [package]
 name = "into-from"
-version = "0.1.3"
+version = "0.1.5"
 edition = "2021"
 license = "Apache-2.0"
 readme = "README.md"
@@ -22,6 +22,4 @@ quote = "1.0"
 syn = {version = "2", features = ["full"]}
 
 [workspace]
-members = [
-    # "example",
-]
+# members = ["example"]

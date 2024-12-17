@@ -10,6 +10,7 @@ Rust macro for auto impl Into\<T> or From\<T> for Struct
 
 impl Into\<Bar> for Foo
 ```rust
+#[derive(Debug, Default)]
 struct Foo {
     field1: i32,
     field3: String,
@@ -25,6 +26,7 @@ struct Bar {
 }
 
 ```
+
 Auto generated code:
 ```rust
 impl Into<Foo> for Bar {
@@ -32,6 +34,29 @@ impl Into<Foo> for Bar {
         Foo {
             field1: self.field1,
             field3: self.field3.to_string(),
+            ...Default::default()
+        }
+    }
+}
+```
+
+```rust
+#[into(Foo, default)]
+struct BarDefault {
+    #[into_skip]
+    field2: String,
+    #[into(self.field3.to_string())]
+    field3: i32,
+}
+```
+
+Auto generated code:
+```rust
+impl Into<Foo> for BarDefault {
+    fn into(self) -> Foo {
+        Foo {
+            field3: self.field3.to_string(),
+            ...Default::default()
         }
     }
 }

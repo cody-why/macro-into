@@ -1,15 +1,39 @@
 use proc_macro::TokenStream;
-use syn::parse_macro_input;
+use syn::{parse::Parse, parse::ParseStream, parse_macro_input, Result as SynResult, Token};
+
+// 定义解析 into 属性参数的结构体
+struct IntoArgs {
+    target_type: syn::Type,
+    use_default: bool,
+}
+
+impl Parse for IntoArgs {
+    fn parse(input: ParseStream) -> SynResult<Self> {
+        let target_type = input.parse()?;
+        let use_default = if input.peek(Token![,]) {
+            input.parse::<Token![,]>()?;
+            input.parse::<syn::Ident>()? == "default"
+        } else {
+            false
+        };
+        Ok(IntoArgs {
+            target_type,
+            use_default,
+        })
+    }
+}
 
 /// impl Into<T> for Struct
 ///
 /// ```rust no_run
+/// #[derive(Debug, Default)]
 /// struct Foo {
 ///     field1: i32,
 ///     field3: String,
 /// }
 ///
-/// #[into(Foo)]
+/// #[into(Foo)]  // no default
+/// //#[into(Foo, default)]  // with default field
 /// struct Bar {
 ///     field1: i32,
 ///     #[into_skip]
@@ -20,11 +44,9 @@ use syn::parse_macro_input;
 /// ```
 #[proc_macro_attribute]
 pub fn into(args: TokenStream, input: TokenStream) -> TokenStream {
-    // let output = input.to_string().replace("#[into_skip]", "");
-    // let output = output.parse::<TokenStream>().unwrap();
-    // let output = parse_macro_input!(output as syn::ItemStruct);
-    // 解析目标类型参数
-    let target = parse_macro_input!(args as syn::Type);
+    let args = parse_macro_input!(args as IntoArgs);
+    let target = args.target_type;
+    let use_default = args.use_default;
     let mut input = parse_macro_input!(input as syn::ItemStruct);
 
     // 获取源结构体字段, 生成字段转换
@@ -35,20 +57,15 @@ pub fn into(args: TokenStream, input: TokenStream) -> TokenStream {
             .filter(|field| !is_skip(field, "into_skip"))
             .map(|field| {
                 let name = &field.ident;
-                // 检查是否有 #[into] 属性
                 field
                     .attrs
                     .iter()
                     .find(|attr| attr.path().is_ident("into"))
                     .map(|attr| {
-                        // 解析 #[into] 属性中的表达式
                         let value = attr.parse_args::<syn::Expr>().unwrap();
                         quote::quote!(#name: #value)
                     })
-                    .unwrap_or_else(|| {
-                        // 如果没有 #[into] 属性，使用默认的字段映射
-                        quote::quote!(#name: self.#name)
-                    })
+                    .unwrap_or_else(|| quote::quote!(#name: self.#name))
             })
             .collect::<Vec<_>>(),
         _ => panic!("Only named fields are supported"),
@@ -67,17 +84,28 @@ pub fn into(args: TokenStream, input: TokenStream) -> TokenStream {
     }
 
     let name = &input.ident;
-    // let vis = &input.vis;
-    // let (_impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
+
+    let struct_init = if use_default {
+        quote::quote! {
+            #target {
+                #(#field_conversions,)*
+                ..Default::default()
+            }
+        }
+    } else {
+        quote::quote! {
+            #target {
+                #(#field_conversions,)*
+            }
+        }
+    };
 
     let gen = quote::quote! {
         #input
 
         impl Into<#target> for #name {
             fn into(self) -> #target {
-                #target {
-                    #(#field_conversions,)*
-                }
+                #struct_init
             }
         }
     };
